@@ -22,7 +22,7 @@ public class Epic extends Task {
         updateStatus();
     }
 
-    private void updateStatus(){
+    public void updateStatus(){
         if(subtasks.isEmpty()){
             setStatus(TaskStatus.NEW);
         return;
@@ -40,5 +40,8 @@ public class Epic extends Task {
         else {
             setStatus(TaskStatus.IN_PROGRESSS);
         }
+    }
+    public void clearSubtasks(){
+        subtasks.clear();
     }
 }

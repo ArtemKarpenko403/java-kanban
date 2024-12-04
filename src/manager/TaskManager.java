@@ -105,5 +105,20 @@ public class TaskManager {
         Epic epic = epics.get(epicId);
         return (epic != null) ? epic.getSubtasks() : List.of();
     }
+public void deleteAllTasks(){
+        tasks.clear();
+}
+public void deleteAllEpics(){
+        epics.clear();
+        subtasks.clear();
+}
+public void deleteAllSubtasks(){
+        subtasks.clear();
+        //Обновляем статус эпиков из-за потери подзадач
+    for (Epic epic : epics.values()) {
+        epic.clearSubtasks();
+        epic.updateStatus();
+    }
 
+}
 }
