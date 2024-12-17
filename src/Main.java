@@ -1,34 +1,26 @@
+import manager.Managers;
 import manager.TaskManager;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
-import tasks.TaskStatus;
 
 public class Main {
-
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        TaskManager manager = Managers.getDefault();
 
-        //Создание задач
-        Task task1 = manager.createTask(new Task("tasks.Task 1", "Description 1"));
-        Task task2 = manager.createTask(new Task("tasks.Task 2", "Description 2"));
+        Task task1 = manager.createTask(new Task("Task 1", "Description 1"));
+        Task task2 = manager.createTask(new Task("Task 2", "Description 2"));
 
-        //Создание эпиков и подзадач
-        Epic epic = manager.createEpic(new Epic("tasks.Epic 1", "Description of Epic1"));
-        Subtask subtask1 = manager.createSubtask(new Subtask("tasks.Subtask 1", "Description of tasks.Subtask 1", epic.getId()));
-        Subtask subtask2 = manager.createSubtask(new Subtask("tasks.Subtask 2", "Description of tasks.Subtask 2", epic.getId()));
+        Epic epic1 = manager.createEpic(new Epic("Epic 1", "Epic Description"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask 1", "Subtask Description", epic1.getId()));
 
-        //Изменить статус
-        subtask1.setStatus(TaskStatus.DONE);
-        manager.updateSubtask(subtask1);
+        // Получаем задачи
+        manager.getTask(task1.getId());
+        manager.getEpic(epic1.getId());
+        manager.getSubtask(subtask1.getId());
 
-        //Печатать задачи
-        System.out.println(manager.getAllTasks());
-        System.out.println(manager.getAllEpics());
-        System.out.println(manager.getAllSubtasks());
-
-        //Удалить задачу
-        manager.deleteTask(task1.getId());
+        // Печатаем историю
+        System.out.println("History:");
+        manager.getHistory().forEach(System.out::println);
     }
-
 }
