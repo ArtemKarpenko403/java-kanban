@@ -15,10 +15,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (task == null) return;
-
-        // Удаляем задачу из истории, если она уже есть
-        remove(task.getId());
-
+        if (historyMap.containsKey(task.getId())) {
+            history.remove(task);
+        }
         history.addLast(task);
         historyMap.put(task.getId(), task);
 
@@ -33,9 +32,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         return new ArrayList<>(history);
     }
 
-    @Override
-    public void remove(int id) {
-        history.removeIf(task -> task.getId() == id);
-        historyMap.remove(id);
-    }
 }
