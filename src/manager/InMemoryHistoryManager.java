@@ -33,14 +33,20 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        // Перекладываем задачи из списка в ArrayList
-        List<Task> history = new ArrayList<>();
+        return getTasks();
+    }
+
+    //Собирает задачи из связного списка и возвращает их в виде ArrayList.
+    private List<Task> getTasks() {
+        List<Task> tasks = new ArrayList<>();
         Node<Task> current = head;
+
         while (current != null) {
-            history.add(current.data);
+            tasks.add(current.data);
             current = current.next;
         }
-        return history;
+
+        return tasks;
     }
 
     // Вспомогательный метод: добавить задачу в конец списка
