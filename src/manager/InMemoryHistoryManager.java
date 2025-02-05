@@ -1,3 +1,4 @@
+// Исправленный класс InMemoryHistoryManager
 package manager;
 
 import tasks.Task;
@@ -5,31 +6,75 @@ import tasks.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final List<Task> history = new ArrayList<>();
-    private static final int HISTORY_LIMIT = 10;
-    private final Map<Integer, Task> historyMap = new HashMap<>();
+    private final HashMap<Integer, Node<Task>> nodeMap = new HashMap<>(); // id -> узел
+    private Node<Task> head;  // Голова списка
+    private Node<Task> tail;  // Хвост списка
 
     @Override
     public void add(Task task) {
-        if (task == null) return;
-        if (historyMap.containsKey(task.getId())) {
-            history.remove(task);
+        // Если задача уже есть, удаляем старую запись
+        if (nodeMap.containsKey(task.getId())) {
+            removeNode(nodeMap.get(task.getId()));
         }
-        history.addLast(task);
-        historyMap.put(task.getId(), task);
 
-        if (history.size() > HISTORY_LIMIT) {
-            Task removed = history.removeFirst();
-            historyMap.remove(removed.getId());
+        // Добавляем задачу в конец списка
+        linkLast(task);
+    }
+
+    @Override
+    public void remove(int id) {
+        // Удаляем задачу из списка, если она есть
+        if (nodeMap.containsKey(id)) {
+            removeNode(nodeMap.get(id));
         }
     }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        return getTasks();
     }
 
+    //Собирает задачи из связного списка и возвращает их в виде ArrayList.
+    private List<Task> getTasks() {
+        List<Task> tasks = new ArrayList<>();
+        Node<Task> current = head;
+
+        while (current != null) {
+            tasks.add(current.data);
+            current = current.next;
+        }
+
+        return tasks;
+    }
+
+    // Вспомогательный метод: добавить задачу в конец списка
+    private void linkLast(Task task) {
+        Node<Task> newNode = new Node<>(tail, task, null);
+        if (tail != null) {
+            tail.next = newNode;
+        } else {
+            head = newNode; // Если список был пуст
+        }
+        tail = newNode;
+        nodeMap.put(task.getId(), newNode); // Обновляем хэш-таблицу
+    }
+
+    // Вспомогательный метод: удалить узел из списка
+    private void removeNode(Node<Task> node) {
+        if (node.prev != null) {
+            node.prev.next = node.next;
+        } else {
+            head = node.next; // Если это был первый узел
+        }
+
+        if (node.next != null) {
+            node.next.prev = node.prev;
+        } else {
+            tail = node.prev; // Если это был последний узел
+        }
+
+        nodeMap.remove(node.data.getId()); // Удаляем из хэш-таблицы
+    }
 }
