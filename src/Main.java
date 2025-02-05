@@ -1,26 +1,17 @@
-import manager.Managers;
-import manager.TaskManager;
-import tasks.Epic;
-import tasks.Subtask;
+import manager.FileBackedTaskManager;
 import tasks.Task;
+
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = Managers.getDefault();
+        FileBackedTaskManager manager = new FileBackedTaskManager(new File("tasks.csv"));
 
-        Task task1 = manager.createTask(new Task("Task 1", "Description 1"));
-        Task task2 = manager.createTask(new Task("Task 2", "Description 2"));
+        Task task = new Task("Купить молоко", "Сходить в магазин");
+        manager.createTask(task);
 
-        Epic epic1 = manager.createEpic(new Epic("Epic 1", "Epic Description"));
-        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask 1", "Subtask Description", epic1.getId()));
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(new File("tasks.csv"));
+        System.out.println(loadedManager.getAllTasks());
 
-        // Получаем задачи
-        manager.getTask(task1.getId());
-        manager.getEpic(epic1.getId());
-        manager.getSubtask(subtask1.getId());
-
-        // Печатаем историю
-        System.out.println("History:");
-        manager.getHistory().forEach(System.out::println);
     }
 }
