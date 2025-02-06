@@ -26,46 +26,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     /**
-     * Метод сохраняет текущие задачи в файл в формате CSV.
-     */
-    private void save() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,name,status,description,epic\n");
-            for (Task task : getAllTasks()) {
-                writer.write(taskToString(task) + "\n");
-            }
-            for (Epic epic : getAllEpics()) {
-                writer.write(taskToString(epic) + "\n");
-            }
-            for (Subtask subtask : getAllSubtasks()) {
-                writer.write(taskToString(subtask) + "\n");
-            }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при сохранении файла", e);
-        }
-    }
-
-    /**
-     * Метод преобразует задачу в строку CSV.
-     */
-    private static String taskToString(Task task) {
-        if (task instanceof Subtask) {
-            Subtask subtask = (Subtask) task;
-            return String.format("%d,%s,%s,%s,%s,%d",
-                    subtask.getId(), TaskType.SUBTASK, subtask.getName(),
-                    subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
-        } else if (task instanceof Epic) {
-            return String.format("%d,%s,%s,%s,%s,",
-                    task.getId(), TaskType.EPIC, task.getName(),
-                    task.getStatus(), task.getDescription());
-        } else {
-            return String.format("%d,%s,%s,%s,%s,",
-                    task.getId(), TaskType.TASK, task.getName(),
-                    task.getStatus(), task.getDescription());
-        }
-    }
-
-    /**
      * Метод загружает задачи из файла в формате CSV.
      *
      * @param file Файл, из которого загружаются задачи.
@@ -94,40 +54,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
 
         return manager;
-    }
-
-    /**
-     * Метод преобразует строку CSV обратно в задачу.
-     */
-    private static Task fromString(String line) {
-        String[] parts = line.split(",");
-        int id = Integer.parseInt(parts[0]);
-        TaskType type = TaskType.valueOf(parts[1]);
-        String name = parts[2];
-        String status = parts[3];
-        String description = parts[4];
-
-        switch (type) {
-
-            case TASK:
-                Task task = new Task(name, description);
-                task.setId(id);
-                task.setStatus(TaskStatus.valueOf(status));
-                return task;
-            case EPIC:
-                Epic epic = new Epic(name, description);
-                epic.setId(id);
-                epic.setStatus(TaskStatus.valueOf(status));
-                return epic;
-            case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
-                Subtask subtask = new Subtask(name, description, epicId);
-                subtask.setId(id);
-                subtask.setStatus(TaskStatus.valueOf(status));
-                return subtask;
-            default:
-                throw new IllegalArgumentException("Неизвестный тип задачи");
-        }
     }
 
     /**
@@ -206,5 +132,79 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void deleteAllSubtasks() {
         super.deleteAllSubtasks();
         save();
+    }
+
+    /**
+     * Метод сохраняет текущие задачи в файл в формате CSV.
+     */
+    private void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write("id,type,name,status,description,epic\n");
+            for (Task task : getAllTasks()) {
+                writer.write(taskToString(task) + "\n");
+            }
+            for (Epic epic : getAllEpics()) {
+                writer.write(taskToString(epic) + "\n");
+            }
+            for (Subtask subtask : getAllSubtasks()) {
+                writer.write(taskToString(subtask) + "\n");
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при сохранении файла", e);
+        }
+    }
+
+    /**
+     * Метод преобразует задачу в строку CSV.
+     */
+    private static String taskToString(Task task) {
+        if (task instanceof Subtask) {
+            Subtask subtask = (Subtask) task;
+            return String.format("%d,%s,%s,%s,%s,%d",
+                    subtask.getId(), TaskType.SUBTASK, subtask.getName(),
+                    subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
+        } else if (task instanceof Epic) {
+            return String.format("%d,%s,%s,%s,%s,",
+                    task.getId(), TaskType.EPIC, task.getName(),
+                    task.getStatus(), task.getDescription());
+        } else {
+            return String.format("%d,%s,%s,%s,%s,",
+                    task.getId(), TaskType.TASK, task.getName(),
+                    task.getStatus(), task.getDescription());
+        }
+    }
+
+    /**
+     * Метод преобразует строку CSV обратно в задачу.
+     */
+    private static Task fromString(String line) {
+        String[] parts = line.split(",");
+        int id = Integer.parseInt(parts[0]);
+        TaskType type = TaskType.valueOf(parts[1]);
+        String name = parts[2];
+        String status = parts[3];
+        String description = parts[4];
+
+        switch (type) {
+
+            case TASK:
+                Task task = new Task(name, description);
+                task.setId(id);
+                task.setStatus(TaskStatus.valueOf(status));
+                return task;
+            case EPIC:
+                Epic epic = new Epic(name, description);
+                epic.setId(id);
+                epic.setStatus(TaskStatus.valueOf(status));
+                return epic;
+            case SUBTASK:
+                int epicId = Integer.parseInt(parts[5]);
+                Subtask subtask = new Subtask(name, description, epicId);
+                subtask.setId(id);
+                subtask.setStatus(TaskStatus.valueOf(status));
+                return subtask;
+            default:
+                throw new IllegalArgumentException("Неизвестный тип задачи");
+        }
     }
 }
