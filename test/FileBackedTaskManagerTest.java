@@ -9,6 +9,8 @@ import tasks.Task;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,25 +25,33 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void saveAndLoadTasks() {
-        Task task = new Task("Задача", "Описание");
-        manager.createTask(task);
-
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
-        assertEquals(1, loadedManager.getAllTasks().size());
-        assertEquals("Задача", loadedManager.getTask(task.getId()).getName());
-    }
-
-    @Test
     void saveAndLoadEpicAndSubtask() {
         Epic epic = new Epic("Эпик", "Описание");
         manager.createEpic(epic);
 
-        Subtask subtask = new Subtask("Подзадача", "Описание", epic.getId());
+        Subtask subtask = new Subtask("Подзадача", "Описание", epic.getId(), Duration.ofMinutes(30),
+                LocalDateTime.now());
         manager.createSubtask(subtask);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
         assertEquals(1, loadedManager.getAllEpics().size());
         assertEquals(1, loadedManager.getAllSubtasks().size());
     }
+    @Test
+    void testSaveAndLoadWithTime() throws Exception {
+        File tempFile = File.createTempFile("tasks", ".csv");
+        FileBackedTaskManager manager = new FileBackedTaskManager(tempFile);
+
+        Task task = new Task("Task 1", "Description", Duration.ofMinutes(30), LocalDateTime.now());
+        manager.createTask(task);
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        Task loadedTask = loadedManager.getTask(task.getId());
+
+        assertEquals(task.getName(), loadedTask.getName());
+        assertEquals(task.getStartTime(), loadedTask.getStartTime());
+        assertEquals(task.getEndTime(), loadedTask.getEndTime());
+        assertEquals(task.getDuration(), loadedTask.getDuration());
+    }
+
 }
