@@ -1,15 +1,50 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Task {
     private int id;
-    protected String name;
-    private final String description;
+    private String name;
+    private String description;
     private TaskStatus status;
+    private Duration duration;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
-    public Task(String name, String description) {
+    public Task(String name, String description, Duration duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
+        this.duration = duration;
+        this.startTime = startTime;
+        this.endTime = startTime != null ? startTime.plus(duration) : null;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+        this.endTime = startTime != null ? startTime.plus(duration) : null;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+        this.endTime = startTime != null ? startTime.plus(duration) : null;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public int getId() {
