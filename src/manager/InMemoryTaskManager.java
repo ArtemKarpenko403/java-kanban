@@ -17,23 +17,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime,
             Comparator.nullsLast(Comparator.naturalOrder())));
 
-    // Метод для проверки пересечения задач
-    private boolean isTaskOverlapping(Task newTask) {
-        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
-            return false; // Задачи без startTime не учитываются
-        }
-        return prioritizedTasks.stream()
-                .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
-                .anyMatch(task -> {
-                    LocalDateTime taskStart = task.getStartTime();
-                    LocalDateTime taskEnd = task.getEndTime();
-                    LocalDateTime newTaskStart = newTask.getStartTime();
-                    LocalDateTime newTaskEnd = newTask.getEndTime();
-
-                    return (newTaskStart.isBefore(taskEnd) && (newTaskEnd.isAfter(taskStart)));
-                });
-    }
-
     // Метод для получения отсортированного списка задач
     @Override
     public List<Task> getPrioritizedTasks() {
@@ -202,5 +185,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    // Метод для проверки пересечения задач
+    private boolean isTaskOverlapping(Task newTask) {
+        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
+            return false; // Задачи без startTime не учитываются
+        }
+        return prioritizedTasks.stream()
+                .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
+                .anyMatch(task -> {
+                    LocalDateTime taskStart = task.getStartTime();
+                    LocalDateTime taskEnd = task.getEndTime();
+                    LocalDateTime newTaskStart = newTask.getStartTime();
+                    LocalDateTime newTaskEnd = newTask.getEndTime();
+
+                    return (newTaskStart.isBefore(taskEnd) && (newTaskEnd.isAfter(taskStart)));
+                });
     }
 }
