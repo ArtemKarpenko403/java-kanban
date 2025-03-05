@@ -3,7 +3,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Task;
 
-
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +20,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldAddTaskToHistory() {
-        Task task1 = new Task("Task 1", "Description 1");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
         task1.setId(1);
 
         historyManager.add(task1);
@@ -27,11 +28,13 @@ class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
         assertEquals(task1, history.get(0));
+        assertEquals(Duration.ofMinutes(30), history.get(0).getDuration()); // Проверка нового поля
+        assertNotNull(history.get(0).getStartTime()); // Проверка нового поля
     }
 
     @Test
     void shouldNotAddDuplicateTasksToHistory() {
-        Task task1 = new Task("Task 1", "Description 1");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
         task1.setId(1);
 
         historyManager.add(task1);
@@ -44,8 +47,8 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldRemoveTaskFromHistory() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
+        Task task2 = new Task("Task 2", "Description 2", Duration.ofMinutes(60), LocalDateTime.now().plusHours(1));
         task1.setId(1);
         task2.setId(2);
 
@@ -61,8 +64,8 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldRemoveLastTaskFromHistory() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
+        Task task2 = new Task("Task 2", "Description 2", Duration.ofMinutes(60), LocalDateTime.now().plusHours(1));
         task1.setId(1);
         task2.setId(2);
 
@@ -84,9 +87,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldAddAndRemoveMultipleTasks() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
-        Task task3 = new Task("Task 3", "Description 3");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
+        Task task2 = new Task("Task 2", "Description 2", Duration.ofMinutes(60), LocalDateTime.now().plusHours(1));
+        Task task3 = new Task("Task 3", "Description 3", Duration.ofMinutes(90), LocalDateTime.now().plusHours(2));
         task1.setId(1);
         task2.setId(2);
         task3.setId(3);
@@ -105,9 +108,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void shouldKeepCorrectOrderAfterMultipleOperations() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
-        Task task3 = new Task("Task 3", "Description 3");
+        Task task1 = new Task("Task 1", "Description 1", Duration.ofMinutes(30), LocalDateTime.now());
+        Task task2 = new Task("Task 2", "Description 2", Duration.ofMinutes(60), LocalDateTime.now().plusHours(1));
+        Task task3 = new Task("Task 3", "Description 3", Duration.ofMinutes(90), LocalDateTime.now().plusHours(2));
         task1.setId(1);
         task2.setId(2);
         task3.setId(3);
