@@ -187,20 +187,21 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    // Метод для проверки пересечения задач
-    private boolean isTaskOverlapping(Task newTask) {
+    @Override
+    public boolean isTaskOverlapping(Task newTask) {
         if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
-            return false; // Задачи без startTime не учитываются
+            return false; // Задачи без времени не учитываются
         }
-        return prioritizedTasks.stream()
-                .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
-                .anyMatch(task -> {
-                    LocalDateTime taskStart = task.getStartTime();
-                    LocalDateTime taskEnd = task.getEndTime();
-                    LocalDateTime newTaskStart = newTask.getStartTime();
-                    LocalDateTime newTaskEnd = newTask.getEndTime();
 
-                    return (newTaskStart.isBefore(taskEnd) && (newTaskEnd.isAfter(taskStart)));
-                });
+        for (Task existingTask : getAllTasks()) {
+            if (existingTask.getStartTime() != null && existingTask.getEndTime() != null) {
+                if (newTask.getStartTime().isBefore(existingTask.getEndTime()) &&
+                        newTask.getEndTime().isAfter(existingTask.getStartTime())) {
+                    return true; // Задачи пересекаются
+                }
+            }
+        }
+
+        return false; // Пересечений нет
     }
 }
